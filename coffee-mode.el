@@ -243,6 +243,7 @@ with CoffeeScript."
     (define-key map (kbd "C-M-a") 'coffee-beginning-of-defun)
     (define-key map (kbd "C-M-e") 'coffee-end-of-block)
     (define-key map (kbd "C-M-h") 'coffee-mark-defun)
+    (define-key map (kbd "C-c C-,") 'coffee-npm-test)
     map)
   "Keymap for CoffeeScript major mode.")
 
@@ -1252,6 +1253,25 @@ it on by default."
   (if coffee-cos-mode
       (add-hook 'after-save-hook 'coffee-compile-file nil t)
     (remove-hook 'after-save-hook 'coffee-compile-file t)))
+
+;;
+;; npm test
+;;
+
+(defcustom coffee-npm-test-buffer "*CoffeeNpmTest*"
+  "The name of CoffeeNpmTest buffer."
+  :type 'string
+  :group 'coffee)
+
+(defun coffee-npm-test ()
+  "Call npm test"
+  (interactive)
+  (unless (comint-check-proc coffee-npm-test-buffer)
+    (make-comint "CoffeeNpmTest"
+                 shell-file-name))
+  (let (project-dir (parent-directory (file-name-directory full-file-name)))
+    (comint-send-string coffee-npm-test-buffer
+                        (concat "cd " project-dir " && npm test\n"))))
 
 (provide 'coffee-mode)
 
